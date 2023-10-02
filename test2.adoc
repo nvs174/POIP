@@ -179,4 +179,3 @@ image::https://sun9-14.userapi.com/impg/DHA6wnlNpYeTyL6ISIbadZ4tHFhRjW0yewz3ww/j
 * [*] Составлена программа для микроконтроллера. 
 
 * [*] Рассмотрена структура и организация памяти.
-
