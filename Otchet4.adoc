@@ -1,5 +1,6 @@
 :figure-caption: Рисунок
 :table-caption: Таблица
+
 include::Tityl_list_2.adoc[]
 
 <<Цель отчета>>
