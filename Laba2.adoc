@@ -24,7 +24,7 @@ include::Tityl_list_3.adoc[lines="12..25"]
 .. Вспомогательные регистры
 .. Специальные регистры
 
-. Выполнить работу с регистрами периферии через обертку на С++ и через адресуемую ячейка памяти
+. Выполнить работу с регистрами периферии с помощью использования специального класса С++ и через адресуемую ячейка памяти
 
 == Регистр
 
@@ -82,18 +82,89 @@ image::Picter/Figure1.png[]
 
 * Так как регистр специального назначения - это просто адресуемая ячейка памяти, то в коде это может мы можем обратиться к данным по этому адресу, разыменовывая указатель, указывающий на этот адрес:
 
+[source, cpp]
+----
+int main() 
+{
+ std::uint32_t* ptr = reinterpret_cast<std::uint32_t*>(0x40020014); // обращаемся к порту А -> GPIOA
+ *ptr ^= (1U << 5U);
+}
+----
 
-
+Либо же используя специальный класс, разница лишь в компактности кода:
 
 [source, cpp]
 ----
 int main() 
 {
-  int c = 463 ;
-  int* ptr = &c ;
-  return 0;
+ GPIOA::ODR::ODR5::High::Set();
 }
 ----
+Пример кода с использование специального класса:
+
+[source, cpp]
+----
+#include "rccregisters.hpp" // for RCC
+#include "gpioaregisters.hpp" // for GPIOA
+#include "gpiocregisters.hpp" // for GPIOэ
+#include "tim1registers.hpp"
 
 
+std::uint32_t SystemCoreClock = 16'000'000U;
 
+extern "C" {
+int __low_level_init(void)
+{
+  
+}
+}
+
+void delay(int cycles)
+{
+  for(int i = 0; i < cycles; ++i)    
+  {   
+    asm volatile("");
+  }    
+}
+
+int main()
+{  
+  // Подать тактирование на порт А
+  RCC::AHB1ENR::GPIOAEN::Enable::Set() ;
+  // Подать тактирование на порт А
+  RCC::AHB1ENR::GPIOCEN::Enable::Set() ;
+  // Порт  А.5 на вывод
+  GPIOA::MODER::MODER5::Output::Set() ;
+  // Порта С.5,С.8,С.9 на вывод
+  GPIOC::MODER::MODER5::Output::Set() ;
+  GPIOC::MODER::MODER8::Output::Set() ;
+  GPIOC::MODER::MODER9::Output::Set() ;
+   
+  for(;;)
+  {
+    // включение 4 светодиодов
+    GPIOA::ODR::ODR5::High::Set();
+   
+    GPIOC::ODR::ODR5::High::Set();
+    
+    GPIOC::ODR::ODR8::High::Set();
+   
+    GPIOC::ODR::ODR9::High::Set();
+  
+    delay(1000000); 
+    
+    // выключение 4 светодиодов
+    GPIOA::ODR::ODR5::Low::Set();
+   
+    GPIOC::ODR::ODR5::Low::Set();
+    
+    GPIOC::ODR::ODR8::Low::Set();
+   
+    GPIOC::ODR::ODR9::Low::Set();
+    
+    delay(1000000);
+  }
+  
+  return 1;
+}
+----
