@@ -170,3 +170,67 @@ int main()
 ----
 
 video::Picter/VID_1.mp4[]
+
+
+Пример кода используя адресуемую ячейка памяти:
+
+[source, cpp]
+----
+#include "rccregisters.hpp" // for RCC
+#include "gpioaregisters.hpp" // for GPIOA
+#include "gpiocregisters.hpp" // for GPIOэ
+#include "tim1registers.hpp"
+
+
+std::uint32_t SystemCoreClock = 16'000'000U;
+
+extern "C" {
+int __low_level_init(void)
+{
+  
+}
+}
+
+void delay(int cycles)
+{
+  for(int i = 0; i < cycles; ++i)    
+  {   
+    asm volatile("");
+  }    
+}
+
+int main()
+{  
+  // Подать тактирование на порт А
+  RCC::AHB1ENR::GPIOAEN::Enable::Set() ;
+  // Подать тактирование на порт А
+  RCC::AHB1ENR::GPIOCEN::Enable::Set() ;
+  // Порт  А.5 на вывод
+  GPIOA::MODER::MODER5::Output::Set() ;
+  // Порта С.5,С.8,С.9 на вывод
+  GPIOC::MODER::MODER5::Output::Set() ;
+  GPIOC::MODER::MODER8::Output::Set() ;
+  GPIOC::MODER::MODER9::Output::Set() ;
+   
+  std::uint32_t* Port_A = reinterpret_cast<std::uint32_t*>(0x40020014); // обращаемся к порту А -> GPIOA
+  
+  std::uint32_t* Port_C = reinterpret_cast<std::uint32_t*>(0x40020814); // обращаемся к порту С -> GPIOС  
+  for(;;)
+  {
+    // при первом входе в программу устанавливаем логическую единицу (+3 В в)
+    // при следующем входе меняем значение бита в адрессе на другой 1 -> 0, 0 -> 1
+    *Port_A ^= (1U << 5U);
+    
+    *Port_C ^= (1U << 5U);
+    
+    *Port_C ^= (1U << 8U);
+    
+    *Port_C ^= (1U << 9U);
+  
+    delay(1000000); 
+        
+  }
+  
+  return 1;
+}
+----
