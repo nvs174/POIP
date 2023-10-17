@@ -169,4 +169,4 @@ int main()
 }
 ----
 
-video::Picter/VID1.mp4[]
+video::Picter/VID1.mp4[width=640,start=60,opts=autoplay]
