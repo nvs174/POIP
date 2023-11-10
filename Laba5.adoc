@@ -43,9 +43,210 @@ include::Tityl_list_3.adoc[lines="12..25"]
 
 * Листинг main.cpp:
 
+[source, cpp]
+----
+#include "rccregisters.hpp" // for RCC
+#include "gpioaregisters.hpp" // for GPIOA
+#include "gpiocregisters.hpp" // for GPIOэ
+#include "Pin3.h"
+#include "PinAll.h"
+#include "Treemode.h"
+#include "ChMode.h"
+#include <array>
 
 
-* Листинг класса Pin3.h 
+
+
+std::uint32_t SystemCoreClock = 16'000'000U;
+
+extern "C" {
+int __low_level_init(void)
+{
+  
+  RCC::CR::HSION::On::Set(); // Включаем внутренний генератор
+  
+  while (RCC::CR::HSIRDY::NotReady::IsSet()) // пустой цикл для ожидание пока внутренний генератор не настроится
+  {
+
+  }
+  
+  RCC::CR::PLLON::On::Set(); // Включение ФАПЧ
+  
+  *reinterpret_cast<std::uint32_t*>(0x40023804) &= 0; // Сброс всех битов в 0
+  
+  RCC::PLLCFGR::PLLSRC::HsiSource::Set(); // Включение тактирования от внутреннего высокочастотного генератора
+  
+  RCC::PLLCFGR::PLLP0::Pllp2::Set(); // устанавливаем занчение PLLP равным 2
+  
+  *reinterpret_cast<std::uint32_t*>(0x40023804) |= (1U << 5U); // устанавливаем занчение PLLM равным 32
+  
+  *reinterpret_cast<std::uint32_t*>(0x40023804) |= (1U << 13U); // устанавливаем занчение PLLN равным 128
+  
+  while (RCC::CR::PLLRDY::Unclocked::IsSet()) // пустой цикл для ожидания пока внутренний генератор не настроится
+  {
+    
+  }
+  
+  RCC::CFGR::SW::Pll::Set(); // выбор на коммутататоре сигнала с ФАПЧ
+  
+  while (!RCC::CFGR::SWS::Pll::IsSet()) // пустой цикл для ожидания пока коммутатор не будет готов
+  {
+    
+  }
+  RCC::APB2ENR::SYSCFGEN::Enable::Set();
+
+  return 1;
+}
+}
+
+
+void delay(int cycles)
+{
+  for(int i = 0; i < cycles; ++i)    
+  {   
+    asm volatile("");
+  }    
+}
+
+
+Pin<GPIOA, 5>  pin1;
+Pin<GPIOC, 9>  pin2;
+Pin<GPIOC, 8>  pin3;
+Pin<GPIOC, 5>  pin4;
+//Pins<pin1,pin2,pin3,pin4> pins;
+
+std::array<Ipin*, 4> pins = {&pin1, &pin2, &pin3, &pin4};
+
+
+//TreeMode<pin1,pin2, pin3, pin4> treemode;
+
+ChessMode<pin1,pin2, pin3, pin4> chessmode;
+
+
+
+int main()
+{  
+  // Подать тактирование на порт А
+  RCC::AHB1ENR::GPIOAEN::Enable::Set() ;
+  // Подать тактирование на порт А
+  RCC::AHB1ENR::GPIOCEN::Enable::Set() ;
+  // Порт  А.5 на вывод
+  GPIOA::MODER::MODER5::Output::Set() ;
+  // Порта С.5,С.8,С.9 на вывод
+  GPIOC::MODER::MODER5::Output::Set() ;
+  GPIOC::MODER::MODER8::Output::Set() ;
+  GPIOC::MODER::MODER9::Output::Set() ;
+  
+  for(;;)
+  {
+    //treemode.Update();
+    chessmode.Update();
+    //delay(100000);
+  }
+  
+  return 1;
+}
+----
+
+* Листинг Mode.h:
+
+[source, cpp]
+----
+#ifndef MODE
+#define MODE
+
+class Mode // класс обновления 
+{
+public:
+  virtual void Update() = 0; // виртуальная функция обновления
+};
+ 
+#endif
+----
+
+* Листинг ChMode.h:
+
+[source, cpp]
+----
+#ifndef CHESSMODE
+#define CHESSMODE
+#include "gpioaregisters.hpp" // for GPIOA
+#include "gpiocregisters.hpp" // for GPIO
+#include "Mode.h"
+#include "ipin.h"
+#include <array>
+
+template <auto& ... pins> // получаем поток данных
+
+class ChessMode: public Mode // производнйы класс от Mode
+{
+
+public: 
+    
+void Update() override // меняем функцию Update() 
+{
+
+  for (; i < leds.size(); i++) 
+  {
+    if (i % 2 == 0)  // так как посылка начинает с 0 (четное число), то 1ый светодиод для МК является четным, для нас не четным
+    {
+      NeChet[g] = leds[i];   // если выполняется условия, то светодиод НЕЧЕТНЫЙ     
+      NeChet[g+2] = leds[i]; // так как массив имеет размер переданных параметров (4), нужно его заполнить весь
+      g++;
+    }
+    else 
+    {
+      Chet[g1] = leds[i];
+      Chet[g1+2] = leds[i];
+      g1++;
+    }
+  }
+
+  
+  for (int k = 0; k < g; k++) 
+  {
+  NeChet[k]->Toggle(); // переключаем нечетный светодиоды 1,3
+  delay(1000000);
+  }
+
+  
+  for (int k1 = 0; k1 < g1; k1++) 
+  {
+    Chet[k1]->Toggle(); // переключаем четные светодиоды 2,4
+    delay(1000000);
+  }
+
+  i = 0;
+  g = 0;
+  g1 = 0;
+
+}
+
+  
+private:
+
+void delay(int cycles)
+{
+  for(int i = 0; i < cycles; ++i)    
+  {   
+    asm volatile("");
+  }    
+}  
+
+std:: size_t g = 0;  // переменная для размера
+std:: size_t g1 = 0; // переменная для размера
+std:: size_t i = 0;  // переменная для размера
+
+std:: array<Ipin*, sizeof ... (pins) > Chet = {&pins ... }; // массив в котором хранятся четные светодиоды, размер массива = переданные параметров (4)
+std:: array<Ipin*, sizeof ... (pins) > NeChet = {&pins ... }; // массив в котором хранятся нечетные светодиоды, размер массива = переданные параметров (4)
+std:: array<Ipin*, sizeof ... (pins) > leds = {&pins ... }; // массив для разделение светодиодов на четыне и не четные, размер массива = переданные параметров (4)
+
+};
+
+
+#endif
+
+----
 
 
 
