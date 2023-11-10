@@ -253,16 +253,10 @@ std:: array<Ipin*, sizeof ... (pins) > leds = {&pins ... }; // массив дл
 == Вывод по работе
 
 
-
-video::Video/VID_2.mp4[]
-
-video::VID_2.mp4[width=640,start=60,opts=autoplay]
-
 video::video-file.mp4[]
 
 
-video::VID_2.mp4[]
-
+video::Video\VID_2.mp4[]
 
 * [*] Изучено что такое класс:
 
