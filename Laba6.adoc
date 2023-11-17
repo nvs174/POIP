@@ -34,7 +34,29 @@ image::Picter/Picter1.png[]
 
 В данном случае подкласс Pin в функция Toggle() реализует переключение состояние светодиодов, для этого требуется:
 
-* [*] Передать два параметра - template <typename Port, int pinNumber >
+* [*] Передать два параметра и написать строку, которая будет переключать состояние светодиодов -
+[source, cpp]
+---- 
+template <typename Port, int pinNumber >
+class Pin: public Ipin
+{
+public: 
+  
+  void Toggle() const override
+  {
+    Port::ODR::Toggle(1<<pinNumber);
+  } 
+};
+----
+
+Далее создается класс IMode, в котором находится виртуальная функция Update().
+
+Подклассы которые наследуют IMode и переписывают функция Update() под требуемы задачи:
+
+* [*] TreeMode
+* [*] ChessMode
+* [*] AllMode
+* [*] Gerland
  
 == Листинг программы и классов
 
