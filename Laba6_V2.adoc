@@ -27,7 +27,7 @@ include::Tityl_list_3.adoc[lines="12..25"]
 == Архитектура 
 
 .Архитектура
-image::Picter/Picter1.png[]
+image::Picter2/Picter1.png[]
 
 
 
