@@ -1,17 +1,13 @@
-#include "rccregisters.hpp" // for RCC
-#include "gpioaregisters.hpp" // for GPIOA
-#include "gpiocregisters.hpp" // for GPIOэ
-#include "Pin3.h"
-#include "PinAll.h"
-#include "Treemode.h"
-#include "ChMode.h"
-#include "Gerland.h"
-#include "AllMode.h"
-#include "Button2.h"
-#include <array>
-#include "stkregisters.hpp"
-#include "scbregisters.hpp"
-#include "tim5registers.hpp"
+#include "rccregisters.hpp"     // for RCC
+#include "gpioaregisters.hpp"   // for GPIOA
+#include "gpiocregisters.hpp"   // for GPIOC
+#include "Pin3.h"               // for pin
+#include "Treemode.h"           // for metod pins
+#include "ChMode.h"             // for metod pins
+#include "Gerland.h"            // for metod pins
+#include "AllMode.h"            // for metod pins
+#include "Button2.h"            // for button
+#include "tim5registers.hpp"    // for TIM5
 
 
 
