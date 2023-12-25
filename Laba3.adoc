@@ -29,14 +29,22 @@ include::Tityl_list_3.adoc[lines="12..25"]
 Результатом унарного оператора плюса (+) является значение его операнда. Операнд оператора унарного оператора сложения должен иметь арифметический тип. 
 Унарный оператор + может изменяет размер переменной
 
+IntegerPromotion - оператор расширяет тип до типа Int, также работает на унарных операторах - и ~, пример:
+[source, cpp]
+----
+char a, b; 
+char c = a+b;   
+----
+Также выполнятся IntegerPromotion для результата a+b, но потом он обрежется до типа char.
+
 * Пример:
 [source, cpp]
 ----
 int main() 
 {
- unsigned short x = 5;
-printf ("%d\n",sizeof(+x));
-printf ("%d\n",sizeof(x));
+unsigned short x = 5;
+std::cout << sizeof(+x) << std::endl;
+std::cout << sizeof(x) << std::endl;
 return 0;
 }
 ----
@@ -62,7 +70,7 @@ int main()
   int y = 10;
   int x;
   x = (y = y - 5, 25 / y);
-  printf("%d", x);
+  std::cout << x << std::endl;
   return 1;
 }
 ----
@@ -121,9 +129,9 @@ int __low_level_init(void)
 
   }
   
-  *reinterpret_cast<std::uint32_t*>(0x40023804) &= 0;
+  
   RCC::PLLCFGR::PLLSRC::HsiSource::Set();
-    RCC::PLLCFGR::write(1U << 16U);
+  RCC::PLLCFGR::write(1U << 16U);
   RCC::PLLCFGR::write(1U << 17U);
   RCC::PLLCFGR::write(1U << 3U);
   RCC::PLLCFGR::write(1U << 13U);
