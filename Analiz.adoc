@@ -66,7 +66,7 @@
 
 .A mountain sunset 
 [#img-sunset,link=https://sun9-73.userapi.com/impg/WfgaLTCWnX_MNRxePl055xCuNYVc8dFsRtxcdw/T31Z96ZwTF4.jpg?size=1549x160&quality=96&sign=ab993e4805a9239e47d1be7c1e72d5bb&type=album] 
-image::sunset.jpg[Sunset,200,100]
+image::sunset.jpg[]
 
 
 
